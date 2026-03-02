@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, Parse};
+use crate::utils::read_input;
 use anyhow::{anyhow, Result};
 use nom::{character::complete::one_of, multi::many1, IResult, Parser};
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -126,35 +126,18 @@ fn calculate_solution(grid: &[Vec<char>]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 07
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 7)?;
     let rows = parse_str_lines(&content, ManifoldRow::parse)?;
     let grid: Vec<Vec<char>> = rows.into_iter().map(|r| r.cells).collect();
-    let (p1, p2) = calculate_solution(&grid)?;
-    println!("{}", format_output("07", p1, p2));
-    Ok(())
+    calculate_solution(&grid)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = ".......S.......
-...............
-.......^.......
-...............
-......^.^......
-...............
-.....^.^.^.....
-...............
-....^.^...^....
-...............
-...^.^...^.^...
-...............
-..^...^.....^..
-...............
-.^.^.^.^.^...^.
-...............";
+    const TEST_INPUT: &str = ".......S.......\n...............\n.......^.......\n...............\n......^.^......\n...............\n.....^.^.^.....\n...............\n....^.^...^....\n...............\n...^.^...^.^...\n...............\n..^...^.....^..\n...............\n.^.^.^.^.^...^.\n...............";
 
     #[test]
     fn test_day_07_solution() -> Result<()> {

@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, unsigned_number, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, unsigned_number, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{
     bytes::complete::tag, multi::separated_list1, sequence::separated_pair, IResult, Parser,
@@ -96,12 +96,10 @@ fn calculate_solution(groups: &[RangeGroup]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 02
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 2)?;
     let groups = parse_str_lines(&content, RangeGroup::parse)?;
-    let (p1, p2) = calculate_solution(&groups)?;
-    println!("{}", format_output("02", p1, p2));
-    Ok(())
+    calculate_solution(&groups)
 }
 
 #[cfg(test)]

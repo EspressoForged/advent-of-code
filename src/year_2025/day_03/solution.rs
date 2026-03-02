@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{character::complete::digit1, combinator::map, IResult, Parser};
 
@@ -73,22 +73,17 @@ fn calculate_solution(banks: &[BatteryBank]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 03
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 3)?;
     let banks = parse_str_lines(&content, BatteryBank::parse)?;
-    let (p1, p2) = calculate_solution(&banks)?;
-    println!("{}", format_output("03", p1, p2));
-    Ok(())
+    calculate_solution(&banks)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "987654321111111
-811111111111119
-234234234234278
-818181911112111";
+    const TEST_INPUT: &str = "987654321111111\n811111111111119\n234234234234278\n818181911112111";
 
     #[test]
     fn test_day_03_solution() -> Result<()> {

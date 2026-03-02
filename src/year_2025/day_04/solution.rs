@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{character::complete::one_of, multi::many1, IResult, Parser};
 
@@ -86,29 +86,18 @@ fn calculate_solution(mut grid: Vec<Vec<char>>) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 04
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 4)?;
     let rows = parse_str_lines(&content, GridRow::parse)?;
     let grid: Vec<Vec<char>> = rows.into_iter().map(|r| r.cells).collect();
-    let (p1, p2) = calculate_solution(grid)?;
-    println!("{}", format_output("04", p1, p2));
-    Ok(())
+    calculate_solution(grid)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "..@@.@@@@.
-@@@.@.@.@@
-@@@@@.@.@@
-@.@@@@..@.
-@@.@@@@.@@
-.@@@@@@@.@
-.@.@.@.@@@
-@.@@@.@@@@
-.@@@@@@@@.
-@.@.@@@.@.";
+    const TEST_INPUT: &str = "..@@.@@@@.\n@@@.@.@.@@\n@@@@@.@.@@\n@.@@@@..@.\n@@.@@@@.@@\n.@@@@@@@.@\n.@.@.@.@@@\n@.@@@.@@@@\n.@@@@@@@@.\n@.@.@@@.@.";
 
     #[test]
     fn test_day_04_solution() -> Result<()> {

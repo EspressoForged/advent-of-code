@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, unsigned_number, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, unsigned_number, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{bytes::complete::tag, IResult};
 use std::collections::HashMap;
@@ -141,38 +141,17 @@ fn calculate_solution(points: &[Point]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 08
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 8)?;
     let points = parse_str_lines(&content, Point::parse)?;
-    let (p1, p2) = calculate_solution(&points)?;
-    println!("{}", format_output("08", p1, p2));
-    Ok(())
+    calculate_solution(&points)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "162,817,812
-57,618,57
-906,360,560
-592,479,940
-352,342,300
-466,668,158
-542,29,236
-431,825,988
-739,650,466
-52,470,668
-216,146,977
-819,987,18
-117,168,530
-805,96,715
-346,949,466
-970,615,88
-941,993,340
-862,61,35
-984,92,344
-425,690,689";
+    const TEST_INPUT: &str = "162,817,812\n57,618,57\n906,360,560\n592,479,940\n352,342,300\n466,668,158\n542,29,236\n431,825,988\n739,650,466\n52,470,668\n216,146,977\n819,987,18\n117,168,530\n805,96,715\n346,949,466\n970,615,88\n941,993,340\n862,61,35\n984,92,344\n425,690,689";
 
     #[test]
     fn test_day_08_solution() -> Result<()> {

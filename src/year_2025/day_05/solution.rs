@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_full, unsigned_number, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_full, unsigned_number, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{
     character::complete::{line_ending, multispace0, multispace1},
@@ -122,29 +122,17 @@ fn calculate_solution(db: &InventoryDb) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 05
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 5)?;
     let db = parse_full(&content, InventoryDb::parse)?;
-    let (p1, p2) = calculate_solution(&db)?;
-    println!("{}", format_output("05", p1, p2));
-    Ok(())
+    calculate_solution(&db)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "3-5
-10-14
-16-20
-12-18
-
-1
-5
-8
-11
-17
-32";
+    const TEST_INPUT: &str = "3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32";
 
     #[test]
     fn test_day_05_solution() -> Result<()> {

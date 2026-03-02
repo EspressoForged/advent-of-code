@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, unsigned_number, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, unsigned_number, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{character::complete::one_of, sequence::pair, IResult, Parser};
 
@@ -51,28 +51,17 @@ fn calculate_solution(instructions: &[Instruction]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 01
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 1)?;
     let instructions = parse_str_lines(&content, Instruction::parse)?;
-    let (p1, p2) = calculate_solution(&instructions)?;
-    println!("{}", format_output("01", p1, p2));
-    Ok(())
+    calculate_solution(&instructions)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "L68
-L30
-R48
-L5
-R60
-L55
-L1
-L99
-R14
-L82";
+    const TEST_INPUT: &str = "L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82";
 
     #[test]
     fn test_day_01_solution() -> Result<()> {

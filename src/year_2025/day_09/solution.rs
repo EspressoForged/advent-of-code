@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::Parse;
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::Parse;
+use crate::utils::read_input;
 use anyhow::{anyhow, Result};
 use nom::{
     bytes::complete::tag, character::complete::i64 as parse_i64, sequence::separated_pair, IResult,
@@ -174,7 +174,7 @@ fn calculate_solution(points: &[Point]) -> Result<(u64, u64)> {
     Ok((part1 as u64, part2 as u64))
 }
 
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 9)?;
     // Input is space-separated points, not line-separated.
     let points: Vec<Point> = content
@@ -186,9 +186,7 @@ pub fn solve() -> Result<()> {
         })
         .collect::<Result<Vec<Point>>>()?;
 
-    let (p1, p2) = calculate_solution(&points)?;
-    println!("{}", format_output("09", p1, p2));
-    Ok(())
+    calculate_solution(&points)
 }
 
 #[cfg(test)]

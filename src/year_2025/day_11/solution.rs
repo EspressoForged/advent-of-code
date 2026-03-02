@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_str_lines, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -101,31 +101,17 @@ fn calculate_solution(connections: &[Connection]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 11
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 11)?;
     let connections = parse_str_lines(&content, Connection::parse)?;
-    let (p1, p2) = calculate_solution(&connections)?;
-    println!("{}", format_output("11", p1, p2));
-    Ok(())
+    calculate_solution(&connections)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "svr: aaa bbb
-aaa: fft
-fft: ccc
-bbb: tty
-tty: ccc
-ccc: ddd eee
-ddd: hub
-hub: fff
-eee: dac
-dac: fff
-fff: ggg hhh
-ggg: out
-hhh: out";
+    const TEST_INPUT: &str = "svr: aaa bbb\naaa: fft\nfft: ccc\nbbb: tty\ntty: ccc\nccc: ddd eee\nddd: hub\nhub: fff\neee: dac\ndac: fff\nfff: ggg hhh\nggg: out\nhhh: out";
 
     #[test]
     fn test_day_11_solution() -> Result<()> {

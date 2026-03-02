@@ -1,3 +1,4 @@
+use crate::utils::run_day;
 use anyhow::Result;
 
 pub mod day_01;
@@ -16,28 +17,18 @@ pub mod day_12;
 pub fn solution() -> Result<()> {
     println!("Year 2025");
 
-    // Create a list of all the solution functions
-    let solutions: Vec<fn() -> Result<()>> = vec![
-        day_01::solution::solve,
-        day_02::solution::solve,
-        day_03::solution::solve,
-        day_04::solution::solve,
-        day_05::solution::solve,
-        day_06::solution::solve,
-        day_07::solution::solve,
-        day_08::solution::solve,
-        day_09::solution::solve,
-        day_10::solution::solve,
-        day_11::solution::solve,
-        day_12::solution::solve,
-    ];
-
-    // Iterate over the solutions, running each and printing any errors
-    for (i, solve_fn) in solutions.iter().enumerate() {
-        if let Err(e) = solve_fn() {
-            eprintln!("Error running Day {:02}: {}", i + 1, e);
-        }
-    }
+    run_day(1, day_01::solution::solve)?;
+    run_day(2, day_02::solution::solve)?;
+    run_day(3, day_03::solution::solve)?;
+    run_day(4, day_04::solution::solve)?;
+    run_day(5, day_05::solution::solve)?;
+    run_day(6, day_06::solution::solve)?;
+    run_day(7, day_07::solution::solve)?;
+    run_day(8, day_08::solution::solve)?;
+    run_day(9, day_09::solution::solve)?;
+    run_day(10, day_10::solution::solve)?;
+    run_day(11, day_11::solution::solve)?;
+    run_day(12, day_12::solution::solve)?;
 
     Ok(())
 }

@@ -1,4 +1,4 @@
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::read_input;
 use anyhow::{Context, Result};
 
 /// Represents a math problem.
@@ -125,21 +125,16 @@ fn calculate_solution(content: &str) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 06
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 6)?;
-    let (p1, p2) = calculate_solution(&content)?;
-    println!("{}", format_output("06", p1, p2));
-    Ok(())
+    calculate_solution(&content)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    const TEST_INPUT: &str = "123 328  51 64 
- 45 64  387 23 
-  6 98  215 314
-*   +   *   +  ";
+    const TEST_INPUT: &str = "123 328  51 64 \n 45 64  387 23 \n  6 98  215 314\n*   +   *   +  ";
 
     #[test]
     fn test_day_06_solution() -> Result<()> {

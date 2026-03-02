@@ -8,6 +8,7 @@ pub mod parser;
 use anyhow::{Context, Result};
 use std::fs;
 use std::path::PathBuf;
+use std::time::Instant;
 
 /// Reads the puzzle input for a specified year and day.
 ///
@@ -32,10 +33,18 @@ pub fn read_input(year: u16, day: u8) -> Result<String> {
     })
 }
 
-/// Formats the result of a puzzle into a standardized, readable string.
+/// Standardized runner for a puzzle.
 ///
-/// Returns a string displaying the day number, the answer for Part 1,
-/// and the answer for Part 2 (or 0 if not applicable).
-pub fn format_output(day: &str, part_one: u64, part_two: u64) -> String {
-    format!("Day {}: {:>20}\t{:>20}", day, part_one, part_two)
+/// It executes the provided `solve_fn`, tracks its execution time,
+/// and prints the formatted results to stdout.
+pub fn run_day(day: u8, solve_fn: fn() -> Result<(u64, u64)>) -> Result<()> {
+    let start = Instant::now();
+    let (p1, p2) = solve_fn().with_context(|| format!("Failed to solve day {:02}", day))?;
+    let duration = start.elapsed();
+
+    println!(
+        "Day {:02}: p1={:<15} p2={:<15} ({:?})",
+        day, p1, p2, duration
+    );
+    Ok(())
 }

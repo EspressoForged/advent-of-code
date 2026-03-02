@@ -1,10 +1,11 @@
-use advent_of_code::utils::parser::{parse_str_lines, unsigned_number, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_str_lines, unsigned_number, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
     character::complete::{one_of, space0},
-    multi::{many1, separated_list1},
+    multi::many1,
+    multi::separated_list1,
     sequence::{delimited, preceded},
     IResult, Parser,
 };
@@ -327,12 +328,10 @@ fn calculate_solution(machines: &[Machine]) -> Result<(u64, u64)> {
 }
 
 /// Entry point for Day 10
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let content = read_input(2025, 10)?;
     let machines = parse_str_lines(&content, Machine::parse)?;
-    let (p1, p2) = calculate_solution(&machines)?;
-    println!("{}", format_output("10", p1, p2));
-    Ok(())
+    calculate_solution(&machines)
 }
 
 #[cfg(test)]

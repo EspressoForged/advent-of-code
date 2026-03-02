@@ -1,5 +1,5 @@
-use advent_of_code::utils::parser::{parse_full, unsigned_number, Parse};
-use advent_of_code::utils::{format_output, read_input};
+use crate::utils::parser::{parse_full, unsigned_number, Parse};
+use crate::utils::read_input;
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -111,13 +111,10 @@ fn calculate_solution(data: &PuzzleData) -> Result<(u64, u64)> {
     Ok((valid_regions as u64, 0))
 }
 
-pub fn solve() -> Result<()> {
+pub fn solve() -> Result<(u64, u64)> {
     let input_str = read_input(2025, 12)?;
     let data = parse_full(&input_str, PuzzleData::parse)?;
-    let (p1, p2) = calculate_solution(&data)?;
-
-    println!("{}", format_output("12", p1, p2));
-    Ok(())
+    calculate_solution(&data)
 }
 
 // --- Unit Tests ---
