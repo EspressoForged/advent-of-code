@@ -37,7 +37,9 @@ macro_rules! register_days {
 pub const fn day_to_u8(day_str: &str) -> u8 {
     // Expects "day_XX"
     let bytes = day_str.as_bytes();
-    if bytes.len() != 6 { return 0; }
+    if bytes.len() != 6 {
+        return 0;
+    }
     let ten = bytes[4] - b'0';
     let one = bytes[5] - b'0';
     ten * 10 + one
@@ -77,10 +79,7 @@ pub fn run_day(year: u16, day: u8, solve_fn: SolveFn) -> Result<()> {
     let duration = start.elapsed();
 
     if p2 == 0 {
-        println!(
-            "[{}] Day {:02}: p1={:<15} ({:?})",
-            year, day, p1, duration
-        );
+        println!("[{}] Day {:02}: p1={:<15} ({:?})", year, day, p1, duration);
     } else {
         println!(
             "[{}] Day {:02}: p1={:<15} p2={:<15} ({:?})",

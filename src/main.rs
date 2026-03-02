@@ -86,9 +86,9 @@ fn run_year(year: u16, parallel: bool) -> Result<()> {
 
     if parallel {
         use rayon::prelude::*;
-        solvers.into_par_iter().try_for_each(|(day, solver)| {
-            advent_of_code::utils::run_day(year, day, solver)
-        })?;
+        solvers
+            .into_par_iter()
+            .try_for_each(|(day, solver)| advent_of_code::utils::run_day(year, day, solver))?;
     } else {
         for (day, solver) in solvers {
             advent_of_code::utils::run_day(year, day, solver)?;
@@ -176,7 +176,10 @@ mod tests {{
         println!("Created {}", year_mod_path);
     } else {
         println!("\nSUCCESS: Scaffolding created.");
-        println!("ACTION REQUIRED: Add `day_{:02}` to the `register_days!` macro in `{}`", day, year_mod_path);
+        println!(
+            "ACTION REQUIRED: Add `day_{:02}` to the `register_days!` macro in `{}`",
+            day, year_mod_path
+        );
     }
 
     Ok(())
