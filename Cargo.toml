@@ -1,0 +1,9 @@
+[package]
+name = "advent-of-code"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.100"
+nom = "8.0.0"
+rayon = "1.11.0"
