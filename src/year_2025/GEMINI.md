@@ -17,5 +17,5 @@ Standardizes the approach for multi-year AoC solutions to ensure scalability and
 - **Regression:** Once the real answer is found, add it as a test case to prevent future refactors from breaking the solution.
 
 ## 4. Input Handling
-- **Pathing:** Use centralized utility functions to resolve paths (`inputs/year_XXXX/day_XX/input.txt`).
+- **Pathing:** Use centralized utility functions to resolve paths (`inputs/year_XXXX/day_XX.txt`).
 - **Streaming:** For very large inputs, consider streaming the file rather than reading the whole string.

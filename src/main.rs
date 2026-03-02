@@ -107,14 +107,14 @@ fn run_all(parallel: bool) -> Result<()> {
 fn generate_day(year: u16, day: u8) -> Result<()> {
     let year_dir = format!("src/year_{}", year);
     let day_dir = format!("{}/day_{:02}", year_dir, day);
-    let input_dir = format!("inputs/year_{}/day_{:02}", year, day);
+    let input_dir = format!("inputs/year_{}", year);
 
     // Create directories
     fs::create_dir_all(&day_dir)?;
     fs::create_dir_all(&input_dir)?;
 
-    // Create input.txt
-    let input_path = format!("{}/input.txt", input_dir);
+    // Create day_XX.txt
+    let input_path = format!("{}/day_{:02}.txt", input_dir, day);
     if !Path::new(&input_path).exists() {
         fs::write(&input_path, "")?;
         println!("Created {}", input_path);

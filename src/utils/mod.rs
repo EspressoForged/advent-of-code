@@ -53,12 +53,11 @@ pub const fn day_to_u8(day_str: &str) -> u8 {
 /// # Errors
 ///
 /// Returns an `anyhow::Error` if the input file cannot be read from the
-/// standard directory structure (`inputs/year_XXXX/day_XX/input.txt`).
+/// Standardized directory structure (`inputs/year_XXXX/day_XX.txt`).
 pub fn read_input(year: u16, day: u8) -> Result<String> {
     let path = PathBuf::from("inputs")
         .join(format!("year_{}", year))
-        .join(format!("day_{:02}", day))
-        .join("input.txt");
+        .join(format!("day_{:02}.txt", day));
 
     fs::read_to_string(&path).with_context(|| {
         format!(
