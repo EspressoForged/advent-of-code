@@ -1,4 +1,4 @@
-# Advent of Code: Expert Solving Standards
+# Advent of Code: Solving Standards
 
 Standardizes the approach for multi-year AoC solutions to ensure scalability and speed.
 

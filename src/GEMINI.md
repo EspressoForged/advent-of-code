@@ -1,4 +1,4 @@
-# Implementation & Safety Standards (Expert Level)
+# Implementation & Safety Standards
 
 This configuration refines the global standards for the `src` directory, focusing on implementation rigor and low-level safety.
 

@@ -1,6 +1,6 @@
-# Global Rust Engineering Standards (Expert Level)
+# Global Rust Engineering Standards
 
-This document establishes the non-negotiable standards for Rust development. As an expert-driven environment, we prioritize safety, performance, and idiomatic clarity.
+This document establishes the non-negotiable standards for Rust development. Prioritize safety, performance, and idiomatic clarity.
 
 ## 1. Tooling & Automation
 - **Formatting:** `cargo fmt` must be executed on every change. 
