@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use std::collections::VecDeque;
 
 /// Represents the execution status of an Intcode virtual machine.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Status {
     /// The program has reached a halt instruction (99).
     Halted,
@@ -13,6 +13,7 @@ pub enum Status {
 }
 
 /// An Intcode virtual machine.
+#[derive(Clone)]
 pub struct Intcode {
     /// The program memory.
     pub memory: Vec<i64>,

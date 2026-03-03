@@ -270,7 +270,7 @@ fn compress_path(path: &[String]) -> Option<Compressed> {
         if main.len() <= 20 {
             return Some(Compressed {
                 main,
-                a: functions.get(0).map(|f| f.join(",")).unwrap_or_default(),
+                a: functions.first().map(|f| f.join(",")).unwrap_or_default(),
                 b: functions.get(1).map(|f| f.join(",")).unwrap_or_default(),
                 c: functions.get(2).map(|f| f.join(",")).unwrap_or_default(),
             });
