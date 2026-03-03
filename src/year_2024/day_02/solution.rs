@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, unsigned_number};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 use nom::{character::complete::space1, multi::separated_list1, IResult, Parser};
 
@@ -49,7 +49,7 @@ fn calculate_solution(reports: &[Vec<i64>]) -> Result<(u64, u64)> {
 
 /// Entry point for Day 02
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2024, 2)?;
+    let content = read_input(Year(2024), Day(2))?;
     let reports = parse_str_lines(&content, parse_report)?;
     calculate_solution(&reports)
 }
@@ -71,7 +71,7 @@ mod tests {
 
     #[test]
     fn test_day_02_full_input() -> Result<()> {
-        let content = read_input(2024, 2)?;
+        let content = read_input(Year(2024), Day(2))?;
         let reports = parse_str_lines(&content, parse_report)?;
         let (p1, p2) = calculate_solution(&reports)?;
         assert_eq!(p1, 402);
@@ -79,3 +79,4 @@ mod tests {
         Ok(())
     }
 }
+

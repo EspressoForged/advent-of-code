@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, Parse};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::{Context, Result};
 use nom::{character::complete::digit1, combinator::map, IResult, Parser};
 
@@ -74,7 +74,7 @@ fn calculate_solution(banks: &[BatteryBank]) -> Result<(u64, u64)> {
 
 /// Entry point for Day 03
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2025, 3)?;
+    let content = read_input(Year(2025), Day(3))?;
     let banks = parse_str_lines(&content, BatteryBank::parse)?;
     calculate_solution(&banks)
 }
@@ -109,3 +109,4 @@ mod tests {
         assert_eq!(find_max_subsequence_val(&b4, 12).unwrap(), 888911112111);
     }
 }
+

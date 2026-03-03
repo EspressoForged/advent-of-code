@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, Parse};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 use nom::{character::complete::one_of, multi::many1, IResult, Parser};
 
@@ -87,7 +87,7 @@ fn calculate_solution(mut grid: Vec<Vec<char>>) -> Result<(u64, u64)> {
 
 /// Entry point for Day 04
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2025, 4)?;
+    let content = read_input(Year(2025), Day(4))?;
     let rows = parse_str_lines(&content, GridRow::parse)?;
     let grid: Vec<Vec<char>> = rows.into_iter().map(|r| r.cells).collect();
     calculate_solution(grid)
@@ -108,3 +108,4 @@ mod tests {
         Ok(())
     }
 }
+

@@ -1,10 +1,10 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use crate::year_2019::intcode::Intcode;
 use anyhow::{Context, Result};
 
 /// Solves Year 2019, Day 5: Sunny with a Chance of Asteroids.
 pub fn solve() -> Result<(u64, u64)> {
-    let input = read_input(2019, 5)?;
+    let input = read_input(Year(2019), Day(5))?;
     let program: Vec<i64> = input
         .trim()
         .split(',')
@@ -83,3 +83,4 @@ mod tests {
         assert_eq!(*vm.run_to_end().unwrap().last().unwrap(), 1);
     }
 }
+

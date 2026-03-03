@@ -1,10 +1,10 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::{Context, Result};
 use std::collections::{HashMap, HashSet};
 
 /// Solves Year 2024, Day 5: Print Queue.
 pub fn solve() -> Result<(u64, u64)> {
-    let input = read_input(2024, 5)?;
+    let input = read_input(Year(2024), Day(5))?;
     let (rules_str, updates_str) = input
         .split_once("\r\n\r\n")
         .or_else(|| input.split_once("\n\n"))
@@ -157,3 +157,4 @@ mod tests {
         assert_eq!(part2_sum, 123);
     }
 }
+

@@ -1,4 +1,4 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::{Context, Result};
 
 /// Solves Year 2015, Day 1: Not Quite Lisp.
@@ -6,7 +6,7 @@ use anyhow::{Context, Result};
 /// # Errors
 /// Returns an error if the input cannot be read.
 pub fn solve() -> Result<(u64, u64)> {
-    let input = read_input(2015, 1).context("Failed to read input for day 01")?;
+    let input = read_input(Year(2015), Day(1)).context("Failed to read input for day 01")?;
 
     let mut floor: i32 = 0;
     let mut part2: Option<usize> = None;
@@ -81,3 +81,4 @@ mod tests {
         }
     }
 }
+

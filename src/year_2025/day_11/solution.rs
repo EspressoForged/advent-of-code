@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, Parse};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
@@ -102,7 +102,7 @@ fn calculate_solution(connections: &[Connection]) -> Result<(u64, u64)> {
 
 /// Entry point for Day 11
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2025, 11)?;
+    let content = read_input(Year(2025), Day(11))?;
     let connections = parse_str_lines(&content, Connection::parse)?;
     calculate_solution(&connections)
 }
@@ -122,3 +122,4 @@ mod tests {
         Ok(())
     }
 }
+

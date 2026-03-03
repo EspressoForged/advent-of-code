@@ -1,4 +1,4 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::{Context, Result};
 use rayon::prelude::*;
 use std::collections::HashSet;
@@ -37,7 +37,7 @@ impl Direction {
 
 /// Solves Year 2024, Day 6: Guard Gallivant.
 pub fn solve() -> Result<(u64, u64)> {
-    let input = read_input(2024, 6)?;
+    let input = read_input(Year(2024), Day(6))?;
     let grid: Vec<Vec<char>> = input
         .lines()
         .filter(|l| !l.is_empty())
@@ -184,3 +184,4 @@ mod tests {
         assert_eq!(part2, 6);
     }
 }
+

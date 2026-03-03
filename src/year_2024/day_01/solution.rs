@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, unsigned_number};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 use nom::{character::complete::space1, sequence::separated_pair, IResult, Parser};
 use std::collections::HashMap;
@@ -39,7 +39,7 @@ fn calculate_solution(pairs: &[(u64, u64)]) -> Result<(u64, u64)> {
 }
 
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2024, 1)?;
+    let content = read_input(Year(2024), Day(1))?;
     let pairs = parse_str_lines(&content, parse_line)?;
     calculate_solution(&pairs)
 }
@@ -64,3 +64,4 @@ mod tests {
         Ok(())
     }
 }
+

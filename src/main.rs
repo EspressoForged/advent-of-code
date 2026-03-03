@@ -1,3 +1,4 @@
+use advent_of_code::{Day, Year};
 use anyhow::{anyhow, Result};
 use clap::{Parser, Subcommand};
 use std::fs;
@@ -55,7 +56,7 @@ fn main() -> Result<()> {
             (Some(year), Some(day)) => {
                 let solver = advent_of_code::get_year_solver(year, day)
                     .ok_or_else(|| anyhow!("Year {}, Day {} not implemented", year, day))?;
-                advent_of_code::utils::run_day(year, day, solver)?;
+                advent_of_code::run_day(Year(year), Day(day), solver)?;
             }
             (Some(year), None) => {
                 run_year(year, cli.parallel)?;
@@ -88,10 +89,10 @@ fn run_year(year: u16, parallel: bool) -> Result<()> {
         use rayon::prelude::*;
         solvers
             .into_par_iter()
-            .try_for_each(|(day, solver)| advent_of_code::utils::run_day(year, day, solver))?;
+            .try_for_each(|(day, solver)| advent_of_code::run_day(Year(year), Day(day), solver))?;
     } else {
         for (day, solver) in solvers {
-            advent_of_code::utils::run_day(year, day, solver)?;
+            advent_of_code::run_day(Year(year), Day(day), solver)?;
         }
     }
     Ok(())
@@ -123,7 +124,7 @@ fn generate_day(year: u16, day: u8) -> Result<()> {
     // Create day_XX/mod.rs
     let mod_path = format!("{}/mod.rs", day_dir);
     if !Path::new(&mod_path).exists() {
-        fs::write(&mod_path, "pub mod solution;\n")?;
+        fs::write(&mod_path, "pub mod solution;\npub use solution::solve;\n")?;
         println!("Created {}", mod_path);
     }
 
@@ -131,7 +132,7 @@ fn generate_day(year: u16, day: u8) -> Result<()> {
     let sol_path = format!("{}/solution.rs", day_dir);
     if !Path::new(&sol_path).exists() {
         let template = format!(
-            r#"use crate::utils::read_input;
+            r#"use crate::utils::{{read_input, Year, Day}};
 use anyhow::Result;
 
 /// Core logic for Year {year}, Day {day:02}
@@ -141,7 +142,7 @@ fn calculate_solution(input: &str) -> Result<(u64, u64)> {{
 }}
 
 pub fn solve() -> Result<(u64, u64)> {{
-    let content = read_input({year}, {day})?;
+    let content = read_input(Year({year}), Day({day}))?;
     calculate_solution(&content)
 }}
 

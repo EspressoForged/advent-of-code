@@ -1,2 +1,2 @@
-﻿pub mod solution;
+pub mod solution;
 pub use solution::solve;

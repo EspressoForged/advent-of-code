@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, unsigned_number, Parse};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 use nom::{character::complete::one_of, sequence::pair, IResult, Parser};
 
@@ -52,7 +52,7 @@ fn calculate_solution(instructions: &[Instruction]) -> Result<(u64, u64)> {
 
 /// Entry point for Day 01
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2025, 1)?;
+    let content = read_input(Year(2025), Day(1))?;
     let instructions = parse_str_lines(&content, Instruction::parse)?;
     calculate_solution(&instructions)
 }
@@ -72,3 +72,4 @@ mod tests {
         Ok(())
     }
 }
+

@@ -1,4 +1,4 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 
 /// Core logic for Year 2024, Day 04
@@ -78,7 +78,7 @@ fn calculate_solution(input: &str) -> Result<(u64, u64)> {
 }
 
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2024, 4)?;
+    let content = read_input(Year(2024), Day(4))?;
     calculate_solution(&content)
 }
 
@@ -105,3 +105,4 @@ MXMXAXMASX";
         Ok(())
     }
 }
+

@@ -1,5 +1,5 @@
 use crate::utils::parser::{parse_str_lines, unsigned_number, Parse};
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::Result;
 use nom::{
     bytes::complete::tag, multi::separated_list1, sequence::separated_pair, IResult, Parser,
@@ -97,7 +97,7 @@ fn calculate_solution(groups: &[RangeGroup]) -> Result<(u64, u64)> {
 
 /// Entry point for Day 02
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2025, 2)?;
+    let content = read_input(Year(2025), Day(2))?;
     let groups = parse_str_lines(&content, RangeGroup::parse)?;
     calculate_solution(&groups)
 }
@@ -149,3 +149,4 @@ mod tests {
         assert!(!is_recursive_id(5));
     }
 }
+

@@ -1,21 +1,32 @@
 use anyhow::{anyhow, Context, Result};
 use std::collections::VecDeque;
 
+/// Represents the execution status of an Intcode virtual machine.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Status {
+    /// The program has reached a halt instruction (99).
     Halted,
+    /// The program is waiting for input (opcode 3).
     NeedsInput,
+    /// The program has produced an output (opcode 4).
     Output(i64),
 }
 
+/// An Intcode virtual machine.
 pub struct Intcode {
+    /// The program memory.
     pub memory: Vec<i64>,
+    /// The current instruction pointer.
     pub pc: usize,
+    /// The input queue.
     pub input: VecDeque<i64>,
+    /// The output queue.
     pub output: VecDeque<i64>,
 }
 
 impl Intcode {
+    /// Creates a new Intcode VM with the given program.
+    #[must_use]
     pub fn new(program: Vec<i64>) -> Self {
         Self {
             memory: program,
@@ -25,10 +36,13 @@ impl Intcode {
         }
     }
 
+    /// Adds a value to the input queue.
     pub fn add_input(&mut self, val: i64) {
         self.input.push_back(val);
     }
 
+    /// Retrieves and removes the oldest value from the output queue.
+    #[allow(dead_code)]
     pub fn get_output(&mut self) -> Option<i64> {
         self.output.pop_front()
     }
@@ -72,7 +86,10 @@ impl Intcode {
         Ok(())
     }
 
-    /// Run the program until it halts or needs input.
+    /// Run the program until it halts, produces output, or needs input.
+    ///
+    /// # Errors
+    /// Returns an error if an invalid opcode or memory access is encountered.
     pub fn step(&mut self) -> Result<Status> {
         loop {
             let instruction = *self
@@ -155,6 +172,9 @@ impl Intcode {
     }
 
     /// Run the program to completion or until it needs input.
+    ///
+    /// # Errors
+    /// Returns an error if execution fails.
     pub fn run(&mut self) -> Result<Status> {
         loop {
             let last_output = self.output.back().copied();
@@ -167,6 +187,9 @@ impl Intcode {
     }
 
     /// Helper to run until halt and collect all outputs.
+    ///
+    /// # Errors
+    /// Returns an error if the program requests input or execution fails.
     pub fn run_to_end(&mut self) -> Result<Vec<i64>> {
         let mut outputs = Vec::new();
         loop {

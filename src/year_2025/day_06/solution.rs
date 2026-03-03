@@ -1,4 +1,4 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::{Context, Result};
 
 /// Represents a math problem.
@@ -126,7 +126,7 @@ fn calculate_solution(content: &str) -> Result<(u64, u64)> {
 
 /// Entry point for Day 06
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2025, 6)?;
+    let content = read_input(Year(2025), Day(6))?;
     calculate_solution(&content)
 }
 
@@ -144,3 +144,4 @@ mod tests {
         Ok(())
     }
 }
+

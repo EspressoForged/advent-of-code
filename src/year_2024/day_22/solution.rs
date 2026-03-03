@@ -1,10 +1,10 @@
-use crate::utils::read_input;
+use crate::utils::{read_input, Year, Day};
 use anyhow::{Context, Result};
 use std::collections::HashMap;
 
 /// Solves Year 2024, Day 22: Monkey Market.
 pub fn solve() -> Result<(u64, u64)> {
-    let input = read_input(2024, 22)?;
+    let input = read_input(Year(2024), Day(22))?;
     let initial_secrets: Vec<u64> = input
         .lines()
         .filter(|l| !l.is_empty())
@@ -123,3 +123,4 @@ mod tests {
         assert_eq!(part2, 23);
     }
 }
+
