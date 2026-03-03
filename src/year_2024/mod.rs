@@ -1,3 +1,3 @@
 use crate::register_days;
 
-register_days!(day_01, day_02, day_03, day_04, day_22, day_25);
+register_days!(day_01, day_02, day_03, day_04, day_05, day_22, day_25);
