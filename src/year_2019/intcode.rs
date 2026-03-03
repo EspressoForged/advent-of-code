@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Result};
 use std::collections::VecDeque;
 
 /// Represents the execution status of an Intcode virtual machine.
@@ -18,6 +18,8 @@ pub struct Intcode {
     pub memory: Vec<i64>,
     /// The current instruction pointer.
     pub pc: usize,
+    /// The relative base for relative mode (mode 2).
+    pub relative_base: i64,
     /// The input queue.
     pub input: VecDeque<i64>,
     /// The output queue.
@@ -31,6 +33,7 @@ impl Intcode {
         Self {
             memory: program,
             pc: 0,
+            relative_base: 0,
             input: VecDeque::new(),
             output: VecDeque::new(),
         }
@@ -47,43 +50,40 @@ impl Intcode {
         self.output.pop_front()
     }
 
-    fn get_param(&self, index: usize, mode: i64) -> Result<i64> {
-        let val = *self
-            .memory
-            .get(self.pc + index)
-            .with_context(|| format!("Missing parameter at index {} for PC {}", index, self.pc))?;
+    fn ensure_memory(&mut self, address: usize) {
+        if address >= self.memory.len() {
+            self.memory.resize(address + 1, 0);
+        }
+    }
+
+    fn get_mem(&mut self, address: usize) -> i64 {
+        self.ensure_memory(address);
+        self.memory[address]
+    }
+
+    fn set_mem(&mut self, address: usize, val: i64) -> Result<()> {
+        self.ensure_memory(address);
+        self.memory[address] = val;
+        Ok(())
+    }
+
+    fn get_param(&mut self, index: usize, mode: i64) -> Result<i64> {
+        let val = self.get_mem(self.pc + index);
         match mode {
-            0 => {
-                let pos = val as usize;
-                self.memory.get(pos).copied().with_context(|| {
-                    format!(
-                        "Invalid memory access at position {} (from param {})",
-                        pos, val
-                    )
-                })
-            }
-            1 => Ok(val), // Immediate mode
+            0 => Ok(self.get_mem(val as usize)), // Position mode
+            1 => Ok(val),                        // Immediate mode
+            2 => Ok(self.get_mem((self.relative_base + val) as usize)), // Relative mode
             _ => Err(anyhow!("Unknown parameter mode {}", mode)),
         }
     }
 
-    fn set_memory(&mut self, index: usize, val: i64) -> Result<()> {
-        let pos_val = *self.memory.get(self.pc + index).with_context(|| {
-            format!(
-                "Missing memory pointer at index {} for PC {}",
-                index, self.pc
-            )
-        })?;
-        let pos = pos_val as usize;
-        if pos >= self.memory.len() {
-            return Err(anyhow!(
-                "Memory access out of bounds at position {} (from param {})",
-                pos,
-                pos_val
-            ));
+    fn get_target_address(&mut self, index: usize, mode: i64) -> Result<usize> {
+        let val = self.get_mem(self.pc + index);
+        match mode {
+            0 => Ok(val as usize),                        // Position mode
+            2 => Ok((self.relative_base + val) as usize), // Relative mode
+            _ => Err(anyhow!("Invalid mode {} for target address", mode)),
         }
-        self.memory[pos] = val;
-        Ok(())
     }
 
     /// Run the program until it halts, produces output, or needs input.
@@ -92,33 +92,34 @@ impl Intcode {
     /// Returns an error if an invalid opcode or memory access is encountered.
     pub fn step(&mut self) -> Result<Status> {
         loop {
-            let instruction = *self
-                .memory
-                .get(self.pc)
-                .with_context(|| format!("Instruction pointer out of bounds at PC {}", self.pc))?;
+            let instruction = self.get_mem(self.pc);
             let opcode = instruction % 100;
             let mode1 = (instruction / 100) % 10;
             let mode2 = (instruction / 1000) % 10;
+            let mode3 = (instruction / 10000) % 10;
 
             match opcode {
                 1 => {
                     // Add
                     let v1 = self.get_param(1, mode1)?;
                     let v2 = self.get_param(2, mode2)?;
-                    self.set_memory(3, v1 + v2)?;
+                    let target = self.get_target_address(3, mode3)?;
+                    self.set_mem(target, v1 + v2)?;
                     self.pc += 4;
                 }
                 2 => {
                     // Multiply
                     let v1 = self.get_param(1, mode1)?;
                     let v2 = self.get_param(2, mode2)?;
-                    self.set_memory(3, v1 * v2)?;
+                    let target = self.get_target_address(3, mode3)?;
+                    self.set_mem(target, v1 * v2)?;
                     self.pc += 4;
                 }
                 3 => {
                     // Input
                     if let Some(val) = self.input.pop_front() {
-                        self.set_memory(1, val)?;
+                        let target = self.get_target_address(1, mode1)?;
+                        self.set_mem(target, val)?;
                         self.pc += 2;
                     } else {
                         return Ok(Status::NeedsInput);
@@ -155,15 +156,23 @@ impl Intcode {
                     // Less than
                     let v1 = self.get_param(1, mode1)?;
                     let v2 = self.get_param(2, mode2)?;
-                    self.set_memory(3, if v1 < v2 { 1 } else { 0 })?;
+                    let target = self.get_target_address(3, mode3)?;
+                    self.set_mem(target, if v1 < v2 { 1 } else { 0 })?;
                     self.pc += 4;
                 }
                 8 => {
                     // Equals
                     let v1 = self.get_param(1, mode1)?;
                     let v2 = self.get_param(2, mode2)?;
-                    self.set_memory(3, if v1 == v2 { 1 } else { 0 })?;
+                    let target = self.get_target_address(3, mode3)?;
+                    self.set_mem(target, if v1 == v2 { 1 } else { 0 })?;
                     self.pc += 4;
+                }
+                9 => {
+                    // Adjust relative base
+                    let v1 = self.get_param(1, mode1)?;
+                    self.relative_base += v1;
+                    self.pc += 2;
                 }
                 99 => return Ok(Status::Halted),
                 _ => return Err(anyhow!("Unknown opcode {} at position {}", opcode, self.pc)),
