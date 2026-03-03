@@ -35,14 +35,14 @@ fn calculate_solution(input: &str) -> Result<(u64, u64)> {
         for c in 0..cols {
             for &(dr, dc) in &directions {
                 let mut found = true;
-                for i in 0..4 {
+                for (i, &target_char) in target.iter().enumerate() {
                     let nr = r as isize + dr * i as isize;
                     let nc = c as isize + dc * i as isize;
                     if nr < 0 || nr >= rows as isize || nc < 0 || nc >= cols as isize {
                         found = false;
                         break;
                     }
-                    if grid[nr as usize][nc as usize] != target[i] as char {
+                    if grid[nr as usize][nc as usize] != target_char as char {
                         found = false;
                         break;
                     }
@@ -78,7 +78,7 @@ fn calculate_solution(input: &str) -> Result<(u64, u64)> {
 }
 
 pub fn solve() -> Result<(u64, u64)> {
-    let content = read_input(2024, 04)?;
+    let content = read_input(2024, 4)?;
     calculate_solution(&content)
 }
 

@@ -20,16 +20,14 @@ impl Schematic {
         let mut heights = [0u8; 5];
         let mut total_volume = 0;
 
-        for col in 0..5 {
-            let mut height = 0;
+        for (col, height) in heights.iter_mut().enumerate() {
             // Scan middle 5 rows (indices 1 to 5)
-            for row in 1..6 {
-                if lines[row].chars().nth(col)? == '#' {
-                    height += 1;
+            for line in lines.iter().skip(1).take(5) {
+                if line.chars().nth(col)? == '#' {
+                    *height += 1;
                 }
             }
-            heights[col] = height;
-            total_volume += height;
+            total_volume += *height;
         }
 
         Some((Self { heights, total_volume }, is_lock))
