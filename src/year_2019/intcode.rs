@@ -185,14 +185,7 @@ impl Intcode {
     /// # Errors
     /// Returns an error if execution fails.
     pub fn run(&mut self) -> Result<Status> {
-        loop {
-            let last_output = self.output.back().copied();
-            let status = self.step()?;
-            match status {
-                Status::Output(v) if Some(v) == last_output => continue,
-                _ => return Ok(status),
-            }
-        }
+        self.step()
     }
 
     /// Helper to run until halt and collect all outputs.
