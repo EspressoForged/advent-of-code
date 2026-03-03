@@ -1,13 +1,14 @@
 use crate::utils::read_input;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::collections::{HashMap, HashSet};
 
 /// Solves Year 2024, Day 5: Print Queue.
 pub fn solve() -> Result<(u64, u64)> {
     let input = read_input(2024, 5)?;
-    let (rules_str, updates_str) = input.split_once("\r\n\r\n")
+    let (rules_str, updates_str) = input
+        .split_once("\r\n\r\n")
         .or_else(|| input.split_once("\n\n"))
-        .unwrap();
+        .context("Invalid input format: missing double newline")?;
 
     // Parse rules: X must be before Y
     // Map of X -> Set of all Y that must be after X
@@ -21,23 +22,34 @@ pub fn solve() -> Result<(u64, u64)> {
     }
 
     // Parse updates
-    let updates: Vec<Vec<u32>> = updates_str.lines()
+    let updates: Vec<Vec<u32>> = updates_str
+        .lines()
         .filter(|l| !l.is_empty())
-        .map(|l| l.split(',').map(|s| s.trim().parse::<u32>().unwrap()).collect())
-        .collect();
+        .map(|l| {
+            l.split(',')
+                .map(|s| {
+                    s.trim()
+                        .parse::<u32>()
+                        .with_context(|| format!("Failed to parse page number: '{}'", s))
+                })
+                .collect::<Result<Vec<u32>>>()
+        })
+        .collect::<Result<Vec<Vec<u32>>>>()?;
 
     let mut part1_sum = 0;
     let mut part2_sum = 0;
 
     for mut update in updates {
         if is_ordered(&update, &rules) {
-            let mid = update[update.len() / 2];
-            part1_sum += mid as u64;
+            if let Some(&mid) = update.get(update.len() / 2) {
+                part1_sum += mid as u64;
+            }
         } else {
             // Part 2: Re-order correctly
             reorder(&mut update, &rules);
-            let mid = update[update.len() / 2];
-            part2_sum += mid as u64;
+            if let Some(&mid) = update.get(update.len() / 2) {
+                part2_sum += mid as u64;
+            }
         }
     }
 
@@ -121,18 +133,23 @@ mod tests {
             }
         }
 
-        let updates: Vec<Vec<u32>> = updates_str.lines()
-            .map(|l| l.split(',').map(|s| s.trim().parse::<u32>().unwrap()).collect())
+        let updates: Vec<Vec<u32>> = updates_str
+            .lines()
+            .map(|l| {
+                l.split(',')
+                    .map(|s| s.trim().parse::<u32>().unwrap())
+                    .collect()
+            })
             .collect();
 
         let mut part1_sum = 0;
         let mut part2_sum = 0;
         for mut update in updates {
             if is_ordered(&update, &rules) {
-                part1_sum += update[update.len() / 2];
+                part1_sum += update[update.len() / 2] as u64;
             } else {
                 reorder(&mut update, &rules);
-                part2_sum += update[update.len() / 2];
+                part2_sum += update[update.len() / 2] as u64;
             }
         }
 

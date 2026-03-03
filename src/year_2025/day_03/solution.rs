@@ -1,6 +1,6 @@
 use crate::utils::parser::{parse_str_lines, Parse};
 use crate::utils::read_input;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use nom::{character::complete::digit1, combinator::map, IResult, Parser};
 
 /// Represents a bank of batteries as a sequence of single-digit joltage values.
@@ -23,10 +23,10 @@ impl Parse for BatteryBank {
 }
 
 /// Generic function to find the largest number formed by a subsequence of length `k`.
-fn find_max_subsequence_val(bank: &[u8], k: usize) -> u64 {
+fn find_max_subsequence_val(bank: &[u8], k: usize) -> Result<u64> {
     let n = bank.len();
     if n < k {
-        return 0;
+        return Ok(0);
     }
 
     let mut current_pos = 0;
@@ -48,26 +48,26 @@ fn find_max_subsequence_val(bank: &[u8], k: usize) -> u64 {
                     val_cmp
                 }
             })
-            .expect("Slice should not be empty based on logic");
+            .context("Slice should not be empty based on logic")?;
 
         result_val = result_val * 10 + (digit as u64);
         current_pos += offset + 1;
     }
 
-    result_val
+    Ok(result_val)
 }
 
 /// Contains the core logic for the day's puzzle.
 fn calculate_solution(banks: &[BatteryBank]) -> Result<(u64, u64)> {
-    let total_joltage_p1: u64 = banks
-        .iter()
-        .map(|bank| find_max_subsequence_val(&bank.joltages, 2))
-        .sum();
+    let mut total_joltage_p1: u64 = 0;
+    for bank in banks {
+        total_joltage_p1 += find_max_subsequence_val(&bank.joltages, 2)?;
+    }
 
-    let total_joltage_p2: u64 = banks
-        .iter()
-        .map(|bank| find_max_subsequence_val(&bank.joltages, 12))
-        .sum();
+    let mut total_joltage_p2: u64 = 0;
+    for bank in banks {
+        total_joltage_p2 += find_max_subsequence_val(&bank.joltages, 12)?;
+    }
 
     Ok((total_joltage_p1, total_joltage_p2))
 }
@@ -97,15 +97,15 @@ mod tests {
     #[test]
     fn test_part_2_examples() {
         let b1 = vec![9, 8, 7, 6, 5, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1];
-        assert_eq!(find_max_subsequence_val(&b1, 12), 987654321111);
+        assert_eq!(find_max_subsequence_val(&b1, 12).unwrap(), 987654321111);
 
         let b2 = vec![8, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9];
-        assert_eq!(find_max_subsequence_val(&b2, 12), 811111111119);
+        assert_eq!(find_max_subsequence_val(&b2, 12).unwrap(), 811111111119);
 
         let b3 = vec![2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 3, 4, 2, 7, 8];
-        assert_eq!(find_max_subsequence_val(&b3, 12), 434234234278);
+        assert_eq!(find_max_subsequence_val(&b3, 12).unwrap(), 434234234278);
 
         let b4 = vec![8, 1, 8, 1, 8, 1, 9, 1, 1, 1, 1, 2, 1, 1, 1];
-        assert_eq!(find_max_subsequence_val(&b4, 12), 888911112111);
+        assert_eq!(find_max_subsequence_val(&b4, 12).unwrap(), 888911112111);
     }
 }

@@ -1,5 +1,5 @@
 use crate::utils::read_input;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use rayon::prelude::*;
 use std::collections::HashSet;
 
@@ -38,12 +38,13 @@ impl Direction {
 /// Solves Year 2024, Day 6: Guard Gallivant.
 pub fn solve() -> Result<(u64, u64)> {
     let input = read_input(2024, 6)?;
-    let grid: Vec<Vec<char>> = input.lines()
+    let grid: Vec<Vec<char>> = input
+        .lines()
         .filter(|l| !l.is_empty())
         .map(|l| l.chars().collect())
         .collect();
 
-    let (start_pos, start_dir) = find_start(&grid).unwrap();
+    let (start_pos, start_dir) = find_start(&grid).context("Start position not found in grid")?;
     let original_visited = simulate_part1(&grid, start_pos, start_dir);
 
     // Part 1: Distinct positions visited
@@ -51,14 +52,13 @@ pub fn solve() -> Result<(u64, u64)> {
 
     // Part 2: Obstacles causing loops
     // We only need to check positions the guard would have visited (excluding start).
-    let width = grid[0].len() as i32;
+    let width = grid.first().map_or(0, |r| r.len()) as i32;
     let height = grid.len() as i32;
 
-    let part2 = original_visited.par_iter()
+    let part2 = original_visited
+        .par_iter()
         .filter(|&&pos| pos != start_pos)
-        .filter(|&&pos| {
-            is_looping(&grid, start_pos, start_dir, pos, width, height)
-        })
+        .filter(|&&pos| is_looping(&grid, start_pos, start_dir, pos, width, height))
         .count() as u64;
 
     Ok((part1, part2))
@@ -80,12 +80,16 @@ fn find_start(grid: &[Vec<char>]) -> Option<((i32, i32), Direction)> {
     None
 }
 
-fn simulate_part1(grid: &[Vec<char>], start_pos: (i32, i32), start_dir: Direction) -> HashSet<(i32, i32)> {
+fn simulate_part1(
+    grid: &[Vec<char>],
+    start_pos: (i32, i32),
+    start_dir: Direction,
+) -> HashSet<(i32, i32)> {
     let mut visited = HashSet::new();
     let mut pos = start_pos;
     let mut dir = start_dir;
     let height = grid.len() as i32;
-    let width = grid[0].len() as i32;
+    let width = grid.first().map_or(0, |r| r.len()) as i32;
 
     loop {
         visited.insert(pos);
@@ -115,16 +119,15 @@ fn is_looping(
     height: i32,
 ) -> bool {
     // 2D bitmask array for tracking (pos, dir)
-    // We use a Vec of Vec for simplicity, though a single Vec could be slightly faster.
     let mut visited_states = vec![0u8; (width * height) as usize];
-    
+
     let mut pos = start_pos;
     let mut dir = start_dir;
 
     loop {
         let idx = (pos.1 * width + pos.0) as usize;
         let bit = dir.bit();
-        
+
         if (visited_states[idx] & bit) != 0 {
             return true; // Loop detected
         }
@@ -163,23 +166,20 @@ mod tests {
 #.........
 ......#...";
 
-        let grid: Vec<Vec<char>> = example.lines()
-            .map(|l| l.chars().collect())
-            .collect();
+        let grid: Vec<Vec<char>> = example.lines().map(|l| l.chars().collect()).collect();
 
         let (start_pos, start_dir) = find_start(&grid).unwrap();
         let original_visited = simulate_part1(&grid, start_pos, start_dir);
-        
+
         let width = grid[0].len() as i32;
         let height = grid.len() as i32;
 
-        let part2 = original_visited.iter()
+        let part2 = original_visited
+            .iter()
             .filter(|&&pos| pos != start_pos)
-            .filter(|&&pos| {
-                is_looping(&grid, start_pos, start_dir, pos, width, height)
-            })
+            .filter(|&&pos| is_looping(&grid, start_pos, start_dir, pos, width, height))
             .count();
-        
+
         assert_eq!(original_visited.len(), 41);
         assert_eq!(part2, 6);
     }

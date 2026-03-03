@@ -1,8 +1,18 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
+use std::collections::VecDeque;
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum Status {
+    Halted,
+    NeedsInput,
+    Output(i64),
+}
 
 pub struct Intcode {
     pub memory: Vec<i64>,
     pub pc: usize,
+    pub input: VecDeque<i64>,
+    pub output: VecDeque<i64>,
 }
 
 impl Intcode {
@@ -10,34 +20,164 @@ impl Intcode {
         Self {
             memory: program,
             pc: 0,
+            input: VecDeque::new(),
+            output: VecDeque::new(),
         }
     }
 
-    /// Run the program to completion.
-    pub fn run(&mut self) -> Result<()> {
+    pub fn add_input(&mut self, val: i64) {
+        self.input.push_back(val);
+    }
+
+    pub fn get_output(&mut self) -> Option<i64> {
+        self.output.pop_front()
+    }
+
+    fn get_param(&self, index: usize, mode: i64) -> Result<i64> {
+        let val = *self
+            .memory
+            .get(self.pc + index)
+            .with_context(|| format!("Missing parameter at index {} for PC {}", index, self.pc))?;
+        match mode {
+            0 => {
+                let pos = val as usize;
+                self.memory.get(pos).copied().with_context(|| {
+                    format!(
+                        "Invalid memory access at position {} (from param {})",
+                        pos, val
+                    )
+                })
+            }
+            1 => Ok(val), // Immediate mode
+            _ => Err(anyhow!("Unknown parameter mode {}", mode)),
+        }
+    }
+
+    fn set_memory(&mut self, index: usize, val: i64) -> Result<()> {
+        let pos_val = *self.memory.get(self.pc + index).with_context(|| {
+            format!(
+                "Missing memory pointer at index {} for PC {}",
+                index, self.pc
+            )
+        })?;
+        let pos = pos_val as usize;
+        if pos >= self.memory.len() {
+            return Err(anyhow!(
+                "Memory access out of bounds at position {} (from param {})",
+                pos,
+                pos_val
+            ));
+        }
+        self.memory[pos] = val;
+        Ok(())
+    }
+
+    /// Run the program until it halts or needs input.
+    pub fn step(&mut self) -> Result<Status> {
         loop {
-            let opcode = self.memory[self.pc] % 100;
+            let instruction = *self
+                .memory
+                .get(self.pc)
+                .with_context(|| format!("Instruction pointer out of bounds at PC {}", self.pc))?;
+            let opcode = instruction % 100;
+            let mode1 = (instruction / 100) % 10;
+            let mode2 = (instruction / 1000) % 10;
+
             match opcode {
                 1 => {
                     // Add
-                    let p1 = self.memory[self.pc + 1] as usize;
-                    let p2 = self.memory[self.pc + 2] as usize;
-                    let p3 = self.memory[self.pc + 3] as usize;
-                    self.memory[p3] = self.memory[p1] + self.memory[p2];
+                    let v1 = self.get_param(1, mode1)?;
+                    let v2 = self.get_param(2, mode2)?;
+                    self.set_memory(3, v1 + v2)?;
                     self.pc += 4;
                 }
                 2 => {
                     // Multiply
-                    let p1 = self.memory[self.pc + 1] as usize;
-                    let p2 = self.memory[self.pc + 2] as usize;
-                    let p3 = self.memory[self.pc + 3] as usize;
-                    self.memory[p3] = self.memory[p1] * self.memory[p2];
+                    let v1 = self.get_param(1, mode1)?;
+                    let v2 = self.get_param(2, mode2)?;
+                    self.set_memory(3, v1 * v2)?;
                     self.pc += 4;
                 }
-                99 => break,
+                3 => {
+                    // Input
+                    if let Some(val) = self.input.pop_front() {
+                        self.set_memory(1, val)?;
+                        self.pc += 2;
+                    } else {
+                        return Ok(Status::NeedsInput);
+                    }
+                }
+                4 => {
+                    // Output
+                    let v1 = self.get_param(1, mode1)?;
+                    self.output.push_back(v1);
+                    self.pc += 2;
+                    return Ok(Status::Output(v1));
+                }
+                5 => {
+                    // Jump-if-true
+                    let v1 = self.get_param(1, mode1)?;
+                    let v2 = self.get_param(2, mode2)?;
+                    if v1 != 0 {
+                        self.pc = v2 as usize;
+                    } else {
+                        self.pc += 3;
+                    }
+                }
+                6 => {
+                    // Jump-if-false
+                    let v1 = self.get_param(1, mode1)?;
+                    let v2 = self.get_param(2, mode2)?;
+                    if v1 == 0 {
+                        self.pc = v2 as usize;
+                    } else {
+                        self.pc += 3;
+                    }
+                }
+                7 => {
+                    // Less than
+                    let v1 = self.get_param(1, mode1)?;
+                    let v2 = self.get_param(2, mode2)?;
+                    self.set_memory(3, if v1 < v2 { 1 } else { 0 })?;
+                    self.pc += 4;
+                }
+                8 => {
+                    // Equals
+                    let v1 = self.get_param(1, mode1)?;
+                    let v2 = self.get_param(2, mode2)?;
+                    self.set_memory(3, if v1 == v2 { 1 } else { 0 })?;
+                    self.pc += 4;
+                }
+                99 => return Ok(Status::Halted),
                 _ => return Err(anyhow!("Unknown opcode {} at position {}", opcode, self.pc)),
             }
         }
-        Ok(())
+    }
+
+    /// Run the program to completion or until it needs input.
+    pub fn run(&mut self) -> Result<Status> {
+        loop {
+            let last_output = self.output.back().copied();
+            let status = self.step()?;
+            match status {
+                Status::Output(v) if Some(v) == last_output => continue,
+                _ => return Ok(status),
+            }
+        }
+    }
+
+    /// Helper to run until halt and collect all outputs.
+    pub fn run_to_end(&mut self) -> Result<Vec<i64>> {
+        let mut outputs = Vec::new();
+        loop {
+            match self.step()? {
+                Status::Halted => break,
+                Status::Output(v) => outputs.push(v),
+                Status::NeedsInput => {
+                    return Err(anyhow!("Program requested input but none available"))
+                }
+            }
+        }
+        Ok(outputs)
     }
 }

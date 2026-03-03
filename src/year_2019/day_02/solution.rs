@@ -1,6 +1,6 @@
 use crate::utils::read_input;
 use crate::year_2019::intcode::Intcode;
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 /// Solves Year 2019, Day 2: 1202 Program Alarm.
 pub fn solve() -> Result<(u64, u64)> {
@@ -8,8 +8,11 @@ pub fn solve() -> Result<(u64, u64)> {
     let program: Vec<i64> = input
         .trim()
         .split(',')
-        .map(|s| s.parse::<i64>().unwrap())
-        .collect();
+        .map(|s| {
+            s.parse::<i64>()
+                .with_context(|| format!("Failed to parse program value: '{}'", s))
+        })
+        .collect::<Result<Vec<i64>>>()?;
 
     // Part 1: Restore the gravity assist program to the "1202 program alarm" state
     let part1 = run_with_params(&program, 12, 2)?;
@@ -33,11 +36,17 @@ pub fn solve() -> Result<(u64, u64)> {
 
 fn run_with_params(program: &[i64], noun: i64, verb: i64) -> Result<i64> {
     let mut mem = program.to_vec();
+    if mem.len() < 3 {
+        return Err(anyhow::anyhow!("Program too short to set params"));
+    }
     mem[1] = noun;
     mem[2] = verb;
     let mut vm = Intcode::new(mem);
     vm.run()?;
-    Ok(vm.memory[0])
+    vm.memory
+        .first()
+        .copied()
+        .context("Empty memory after program execution")
 }
 
 #[cfg(test)]
