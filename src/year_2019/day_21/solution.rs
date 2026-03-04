@@ -17,8 +17,42 @@ pub fn solve() -> Result<(u64, u64)> {
         })
         .collect::<Result<Vec<i64>>>()?;
 
-    let part1 = run_springscript(&program, &["NOT A J", "NOT B T", "OR T J", "NOT C T", "OR T J", "AND D J", "WALK"])?;
-    let part2 = run_springscript(&program, &["NOT A J", "NOT B T", "OR T J", "NOT C T", "OR T J", "AND D J", "NOT E T", "NOT T T", "OR H T", "AND T J", "RUN"])?;
+    // Part 1 Logic: Jump if there is a hole within the next three tiles AND there is ground to land on.
+    // Formula: (!A || !B || !C) && D
+    // Mapping to instructions:
+    let part1_script = [
+        "NOT A J", // J = !A
+        "NOT B T", // T = !B
+        "OR T J",  // J = !A || !B
+        "NOT C T", // T = !C
+        "OR T J",  // J = !A || !B || !C
+        "AND D J", // J = (!A || !B || !C) && D
+        "WALK",
+    ];
+    let part1 = run_springscript(&program, &part1_script)?;
+
+    // Part 2 Logic: Similar to Part 1, but avoid "landing traps" (where D is ground but E and H are holes).
+    // Droid must be able to either step forward (E) or jump immediately again (H) after landing at D.
+    // Formula: (!A || !B || !C) && D && (E || H)
+    // Mapping to instructions:
+    let part2_script = [
+        // 1. Calculate (!A || !B || !C) && D (Same as Part 1)
+        "NOT A J",
+        "NOT B T",
+        "OR T J",
+        "NOT C T",
+        "OR T J",
+        "AND D J",
+        // 2. Calculate (E || H) using T as a scratchpad.
+        // Since there is no "MOV E T", we use the NOT-NOT identity trick: T = !!E = E.
+        "NOT E T", // T = !E
+        "NOT T T", // T = !!E = E
+        "OR H T",  // T = E || H
+        // 3. Final jump condition: [Part 1] && [Safety Check]
+        "AND T J",
+        "RUN",
+    ];
+    let part2 = run_springscript(&program, &part2_script)?;
 
     Ok((part1, part2))
 }
