@@ -80,14 +80,13 @@ fn count_recursive(
 
     if spring_idx == springs.len() {
         // End of springs
-        let res = if group_idx == groups.len() && current_group_len == 0 {
-            1
-        } else if group_idx == groups.len() - 1 && current_group_len == groups[group_idx] {
+        return if (group_idx == groups.len() && current_group_len == 0)
+            || (group_idx == groups.len() - 1 && current_group_len == groups[group_idx])
+        {
             1
         } else {
             0
         };
-        return res;
     }
 
     let mut res = 0;
@@ -103,10 +102,18 @@ fn count_recursive(
     }
 
     // Try treating as '#'
-    if char_at == b'#' || char_at == b'?' {
-        if group_idx < groups.len() && current_group_len < groups[group_idx] {
-            res += count_recursive(springs, groups, spring_idx + 1, group_idx, current_group_len + 1, memo);
-        }
+    if (char_at == b'#' || char_at == b'?')
+        && group_idx < groups.len()
+        && current_group_len < groups[group_idx]
+    {
+        res += count_recursive(
+            springs,
+            groups,
+            spring_idx + 1,
+            group_idx,
+            current_group_len + 1,
+            memo,
+        );
     }
 
     memo.insert(key, res);
