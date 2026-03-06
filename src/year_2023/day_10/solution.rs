@@ -6,11 +6,6 @@ use std::collections::{HashSet, VecDeque};
 ///
 /// # Errors
 /// Returns an error if the input cannot be read or the loop cannot be found.
-///
-/// # Examples
-/// ```
-/// let result = solve();
-/// ```
 pub fn solve() -> Result<(u64, u64)> {
     let input = read_input(Year(2023), Day(10))?;
     let grid: Vec<Vec<char>> = input.lines().map(|l| l.chars().collect()).collect();
