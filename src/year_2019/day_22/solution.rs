@@ -265,17 +265,18 @@ cut -1";
     #[test]
     fn test_part2_math_check() -> Result<()> {
         // Verify that run_shuffle_part2 correctly reverses the shuffle.
-        // For a small deck, shuffle once, pick a result position, find the card.
-        let input = "deal with increment 7
-deal into new stack
-deal into new stack";
-        let deck_size = 10;
+        // For a large deck, shuffle once, pick a result position, find the card.
+        let input = read_input(Year(2019), Day(22))?;
+        let deck_size = 119315717514047i128;
         let iterations = 1;
         
-        // Forward: card 4 ends up at pos 8 (from Example 1)
-        // Reverse: at pos 8, we should find card 4.
-        let card = run_shuffle_part2(input, deck_size, iterations, 8)?;
-        assert_eq!(card, 4);
+        let card_to_track = 2019;
+        // Forward: find where card 2019 ends up
+        let pos = run_shuffle(&input, deck_size, card_to_track)?;
+        
+        // Reverse: at that position, we should find card 2019.
+        let card = run_shuffle_part2(&input, deck_size, iterations, pos as i128)?;
+        assert_eq!(card as i128, card_to_track);
         
         Ok(())
     }
