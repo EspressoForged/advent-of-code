@@ -176,10 +176,8 @@ pub fn solve() -> Result<(u64, u64)> {
         for j in i + 1..mask_vec.len() {
             let (m1, v1) = mask_vec[i];
             let (m2, v2) = mask_vec[j];
-            if (m1 & m2) == 0 {
-                if v1 + v2 > p2 {
-                    p2 = v1 + v2;
-                }
+            if (m1 & m2) == 0 && v1 + v2 > p2 {
+                p2 = v1 + v2;
             }
         }
     }
@@ -220,11 +218,9 @@ Valve JJ has flow rate=21; tunnel leads to valve II
             for j in i + 1..mask_vec.len() {
                 let (m1, v1) = mask_vec[i];
                 let (m2, v2) = mask_vec[j];
-                if (m1 & m2) == 0 {
-                    if v1 + v2 > p2 {
-                        p2 = v1 + v2;
-                    }
-                }
+            if (m1 & m2) == 0 && v1 + v2 > p2 {
+                p2 = v1 + v2;
+            }
             }
         }
         assert_eq!(p2, 1707);
