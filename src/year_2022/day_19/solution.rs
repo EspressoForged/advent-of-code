@@ -121,9 +121,9 @@ fn dfs(state: State, b: &Blueprint, max_ore: u32, max_geodes: &mut u32) {
             let mut next = state;
             next.time_left -= t;
             next.ore = next.ore + next.ore_robots * t - b.geode_robot_ore_cost;
-            next.clay = next.clay + next.clay_robots * t;
+            next.clay += next.clay_robots * t;
             next.obsidian = next.obsidian + next.obsidian_robots * t - b.geode_robot_obsidian_cost;
-            next.geodes = next.geodes + next.geode_robots * t;
+            next.geodes += next.geode_robots * t;
             next.geode_robots += 1;
             dfs(next, b, max_ore, max_geodes);
         }
@@ -137,8 +137,8 @@ fn dfs(state: State, b: &Blueprint, max_ore: u32, max_geodes: &mut u32) {
                 next.time_left -= t;
                 next.ore = next.ore + next.ore_robots * t - b.obsidian_robot_ore_cost;
                 next.clay = next.clay + next.clay_robots * t - b.obsidian_robot_clay_cost;
-                next.obsidian = next.obsidian + next.obsidian_robots * t;
-                next.geodes = next.geodes + next.geode_robots * t;
+                next.obsidian += next.obsidian_robots * t;
+                next.geodes += next.geode_robots * t;
                 next.obsidian_robots += 1;
                 dfs(next, b, max_ore, max_geodes);
             }
@@ -152,9 +152,9 @@ fn dfs(state: State, b: &Blueprint, max_ore: u32, max_geodes: &mut u32) {
                 let mut next = state;
                 next.time_left -= t;
                 next.ore = next.ore + next.ore_robots * t - b.clay_robot_ore_cost;
-                next.clay = next.clay + next.clay_robots * t;
-                next.obsidian = next.obsidian + next.obsidian_robots * t;
-                next.geodes = next.geodes + next.geode_robots * t;
+                next.clay += next.clay_robots * t;
+                next.obsidian += next.obsidian_robots * t;
+                next.geodes += next.geode_robots * t;
                 next.clay_robots += 1;
                 dfs(next, b, max_ore, max_geodes);
             }
@@ -168,9 +168,9 @@ fn dfs(state: State, b: &Blueprint, max_ore: u32, max_geodes: &mut u32) {
                 let mut next = state;
                 next.time_left -= t;
                 next.ore = next.ore + next.ore_robots * t - b.ore_robot_ore_cost;
-                next.clay = next.clay + next.clay_robots * t;
-                next.obsidian = next.obsidian + next.obsidian_robots * t;
-                next.geodes = next.geodes + next.geode_robots * t;
+                next.clay += next.clay_robots * t;
+                next.obsidian += next.obsidian_robots * t;
+                next.geodes += next.geode_robots * t;
                 next.ore_robots += 1;
                 dfs(next, b, max_ore, max_geodes);
             }
@@ -184,19 +184,19 @@ fn time_to_build(ore_cost: u32, clay_cost: u32, obsidian_cost: u32, state: &Stat
     // Ore requirement
     if ore_cost > state.ore {
         if state.ore_robots == 0 { return None; }
-        t = t.max((ore_cost - state.ore + state.ore_robots - 1) / state.ore_robots);
+        t = t.max((ore_cost - state.ore).div_ceil(state.ore_robots));
     }
 
     // Clay requirement
     if clay_cost > state.clay {
         if state.clay_robots == 0 { return None; }
-        t = t.max((clay_cost - state.clay + state.clay_robots - 1) / state.clay_robots);
+        t = t.max((clay_cost - state.clay).div_ceil(state.clay_robots));
     }
 
     // Obsidian requirement
     if obsidian_cost > state.obsidian {
         if state.obsidian_robots == 0 { return None; }
-        t = t.max((obsidian_cost - state.obsidian + state.obsidian_robots - 1) / state.obsidian_robots);
+        t = t.max((obsidian_cost - state.obsidian).div_ceil(state.obsidian_robots));
     }
 
     Some(t + 1)
